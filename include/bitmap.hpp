@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 #include <stdio.h>
 #include <stdint.h>
 #include <vector>
@@ -42,7 +43,7 @@ namespace IMAGE
         std::vector<RGB> pixels;
 
         int decode(uint8_t* raw_data);
-        uint8_t* encode();
+        std::unique_ptr<uint8_t[]> encode();
 
         int load(FILE* fp);
         int save(FILE* fp);
@@ -50,3 +51,4 @@ namespace IMAGE
 } // namespace BITMAP
 
 std::ostream& operator<<(std::ostream& os, const IMAGE::RGB& pixel);
+std::ostream& operator<<(std::ostream& os, const IMAGE::BITMAP_HEADER& header);

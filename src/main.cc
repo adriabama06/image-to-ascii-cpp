@@ -8,6 +8,7 @@ using namespace IMAGE;
 int main(int argc, const char** argv)
 {
     FILE* fp = fopen(argv[1], "rb");
+    FILE* out_fp = fopen("out.bmp", "wb");
 
     if(fp == NULL)
     {
@@ -21,7 +22,12 @@ int main(int argc, const char** argv)
 
     cout << bmp.pixels.at(0) << endl;
 
+    cout << bmp.header << endl;
+
+    bmp.save(out_fp);
+
     fclose(fp);
+    fclose(out_fp);
 
     return 0;
 }
