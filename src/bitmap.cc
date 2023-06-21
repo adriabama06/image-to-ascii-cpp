@@ -1,14 +1,14 @@
 #include "include/bitmap.hpp"
 
 #include <iostream>
-#include <stdlib.h>
-#include <memory.h>
+#include <cstdlib>
+#include <cstring>
 #include <memory>
 
 using namespace std;
 using namespace IMAGE;
 
-vector<RGB> flip_horizontally(vector<RGB> pixels, BITMAP_HEADER& header)
+vector<RGB> flip_horizontally(vector<RGB> pixels, const BITMAP_HEADER& header)
 {
     auto flip_pixels = vector<RGB>();
 
