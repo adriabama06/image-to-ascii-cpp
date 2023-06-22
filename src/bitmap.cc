@@ -11,7 +11,7 @@ using namespace IMAGE;
 
 vector<RGB> flip_horizontally(vector<RGB> pixels, const BITMAP_HEADER& header)
 {
-    auto flip_pixels = vector<RGB>();
+    vector<RGB> flip_pixels;
     flip_pixels.reserve(header.width * header.height);
 
     for(int32_t row = header.height - 1; row >= 0; row--)
@@ -83,23 +83,19 @@ int BITMAP::load(std::istream& input)
     input.seekg(0, ios::beg); // go to the start of the file
 
 
-    auto raw_data = vector<uint8_t>(input_size);
+    vector<uint8_t> raw_data(input_size);
 
     input.read(reinterpret_cast<char*>(raw_data.data()), input_size);
 
 
     int err = this->decode(raw_data.data());
 
-    if(err) {
-        cout << "Error on decode" << endl;
-    }
-
     return err;
 }
 
 vector<uint8_t> BITMAP::encode()
 {
-    auto raw_data = vector<uint8_t>(header.dataoffset + header.imagesize);
+    vector<uint8_t> raw_data(header.dataoffset + header.imagesize);
 
     memcpy(raw_data.data() + 2, &this->header, 52);
     memcpy(raw_data.data(), &this->header.signature, 2);
