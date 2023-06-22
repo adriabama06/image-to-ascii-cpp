@@ -81,12 +81,12 @@ int BITMAP::load(FILE* fp)
     rewind(fp); // go to the start of the file
 
 
-    auto raw_data = unique_ptr<uint8_t[]>(new uint8_t[fp_size]);
+    auto raw_data = vector<uint8_t>(fp_size);
 
-    fread(raw_data.get(), sizeof(uint8_t), fp_size, fp);
+    fread(raw_data.data(), sizeof(uint8_t), fp_size, fp);
 
 
-    int err = this->decode(raw_data.get());
+    int err = this->decode(raw_data.data());
 
     if(err) {
         cout << "Error on decode" << endl;
