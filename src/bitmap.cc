@@ -1,4 +1,4 @@
-#include "include/bitmap.hpp"
+#include "include/image.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -93,6 +93,18 @@ int BITMAP::load(std::istream& input)
     return err;
 }
 
+int BITMAP::load(std::string& file)
+{
+    ifstream input(file, ios::binary);
+
+    if (!input)
+    {
+        return 1;
+    }
+
+    return this->load(input);
+}
+
 vector<uint8_t> BITMAP::encode()
 {
     vector<uint8_t> raw_data(header.dataoffset + header.imagesize);
@@ -159,4 +171,15 @@ int BITMAP::save(std::ostream& output)
     }
 
     return 0;
+}
+
+int BITMAP::save(string& file)
+{
+    ofstream output(file, ios::binary);
+
+    if (!output) {
+        return 1;
+    }
+
+    return this->save(output);
 }

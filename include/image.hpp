@@ -40,6 +40,12 @@ namespace IMAGE
     class BITMAP
     {
     public:
+        BITMAP() {}
+        ~BITMAP() {}
+        BITMAP(std::string& file) {
+            this->load(file);
+        }
+
         BITMAP_HEADER header;
         std::vector<RGB> pixels;
 
@@ -47,7 +53,10 @@ namespace IMAGE
         std::vector<uint8_t> encode();
 
         int load(std::istream& input);
+        int load(std::string& file);
+
         int save(std::ostream& output);
+        int save(std::string& file);
     };
 } // namespace BITMAP
 

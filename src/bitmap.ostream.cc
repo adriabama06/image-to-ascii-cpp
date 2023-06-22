@@ -1,4 +1,4 @@
-#include "include/bitmap.hpp"
+#include "include/image.hpp"
 
 std::ostream& operator<<(std::ostream& os, const IMAGE::RGB& pixel)
 {

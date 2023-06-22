@@ -1,4 +1,4 @@
-#include "include/bitmap.hpp"
+#include "include/image.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -8,18 +8,10 @@ using namespace IMAGE;
 
 int main(int argc, const char** argv)
 {
-    ifstream input(argv[1], ios::binary);
-    ofstream output("out.bmp", ios::binary);
+    string input = string(argv[1]);
+    string output = string(argc >= 2 ? argv[2] : "out.bmp");
 
-    if (!input)
-    {
-        cout << "Error opening file: " << argv[1] << endl;
-        exit(1);
-    }
-
-    BITMAP bmp;
-
-    bmp.load(input);
+    BITMAP bmp(input);
 
     cout << bmp.pixels.at(0) << endl;
     cout << bmp.header << endl;
