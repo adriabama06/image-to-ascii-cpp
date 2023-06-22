@@ -43,7 +43,7 @@ namespace IMAGE
         std::vector<RGB> pixels;
 
         int decode(uint8_t* raw_data);
-        std::unique_ptr<uint8_t[]> encode();
+        std::vector<uint8_t> encode();
 
         int load(FILE* fp);
         int save(FILE* fp);

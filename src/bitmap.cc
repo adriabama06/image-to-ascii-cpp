@@ -95,21 +95,21 @@ int BITMAP::load(FILE* fp)
     return err;
 }
 
-unique_ptr<uint8_t[]> BITMAP::encode()
+vector<uint8_t> BITMAP::encode()
 {
-    auto raw_data = unique_ptr<uint8_t[]>(new uint8_t[header.dataoffset + header.imagesize]);
+    auto raw_data = vector<uint8_t>(header.dataoffset + header.imagesize);
 
-    memcpy(raw_data.get() + 2, &this->header, 52);
-    memcpy(raw_data.get(), &this->header.signature, 2);
+    memcpy(raw_data.data() + 2, &this->header, 52);
+    memcpy(raw_data.data(), &this->header.signature, 2);
 
     if (header.dataoffset > 54)
     {
-        memset(raw_data.get() + 54, (uint8_t) 0, header.dataoffset - 54);
+        memset(raw_data.data() + 54, (uint8_t) 0, header.dataoffset - 54);
     }
 
     uint32_t padding = header.width - ((header.width / 4) * 4);
 
-    uint8_t* raw_pixels = raw_data.get() + header.dataoffset;
+    uint8_t* raw_pixels = raw_data.data() + header.dataoffset;
 
     uint32_t width_count = 0;
     uint32_t normal_count = 0;
@@ -150,10 +150,10 @@ unique_ptr<uint8_t[]> BITMAP::encode()
 
 int BITMAP::save(FILE* fp)
 {
-    unique_ptr<uint8_t[]> raw_data = encode();
+    vector<uint8_t> raw_data = encode();
     uint32_t raw_data_size = header.dataoffset + header.imagesize;
 
-    size_t wroted_bytes = fwrite(raw_data.get(), sizeof(uint8_t), raw_data_size, fp);
+    size_t wroted_bytes = fwrite(raw_data.data(), sizeof(uint8_t), raw_data_size, fp);
 
     if(wroted_bytes != raw_data_size)
     {
