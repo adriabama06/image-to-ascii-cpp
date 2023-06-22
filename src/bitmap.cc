@@ -11,7 +11,7 @@ using namespace IMAGE;
 
 vector<RGB> flip_horizontally(vector<RGB> pixels, const BITMAP_HEADER& header)
 {
-    auto flip_pixels = vector<RGB>(header.imagesize);
+    auto flip_pixels = vector<RGB>();
 
     for(int32_t row = header.height - 1; row >= 0; row--)
     {
