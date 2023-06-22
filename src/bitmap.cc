@@ -12,6 +12,7 @@ using namespace IMAGE;
 vector<RGB> flip_horizontally(vector<RGB> pixels, const BITMAP_HEADER& header)
 {
     auto flip_pixels = vector<RGB>();
+    flip_pixels.reserve(header.width * header.height);
 
     for(int32_t row = header.height - 1; row >= 0; row--)
     {
@@ -44,6 +45,8 @@ int BITMAP::decode(uint8_t* raw_data)
     uint8_t* raw_pixels = raw_data + header.dataoffset;
 
     uint32_t width_count = 0;
+
+    pixels.reserve(header.width * header.height);
 
     for (uint32_t i = 0; i < header.imagesize;)
     {
