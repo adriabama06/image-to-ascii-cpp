@@ -1,33 +1,30 @@
 #include "include/bitmap.hpp"
 
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 using namespace IMAGE;
 
 int main(int argc, const char** argv)
 {
-    FILE* fp = fopen(argv[1], "rb");
-    FILE* out_fp = fopen("out.bmp", "wb");
+    ifstream input(argv[1], ios::binary);
+    ofstream output("out.bmp", ios::binary);
 
-    if(fp == NULL)
+    if (!input)
     {
         cout << "Error opening file: " << argv[1] << endl;
         exit(1);
     }
 
-    BITMAP bmp = BITMAP();
+    BITMAP bmp;
 
-    bmp.load(fp);
+    bmp.load(input);
 
     cout << bmp.pixels.at(0) << endl;
-
     cout << bmp.header << endl;
 
-    bmp.save(out_fp);
-
-    fclose(fp);
-    fclose(out_fp);
+    bmp.save(output);
 
     return 0;
 }

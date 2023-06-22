@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <vector>
+#include <fstream>
 
 namespace IMAGE
 {
@@ -45,8 +46,8 @@ namespace IMAGE
         int decode(uint8_t* raw_data);
         std::vector<uint8_t> encode();
 
-        int load(FILE* fp);
-        int save(FILE* fp);
+        int load(std::istream& input);
+        int save(std::ostream& output);
     };
 } // namespace BITMAP
 

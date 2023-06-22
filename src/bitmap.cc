@@ -4,13 +4,14 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <fstream>
 
 using namespace std;
 using namespace IMAGE;
 
 vector<RGB> flip_horizontally(vector<RGB> pixels, const BITMAP_HEADER& header)
 {
-    auto flip_pixels = vector<RGB>();
+    auto flip_pixels = vector<RGB>(header.imagesize);
 
     for(int32_t row = header.height - 1; row >= 0; row--)
     {
@@ -38,8 +39,6 @@ int BITMAP::decode(uint8_t* raw_data)
         return 1;
     }
     
-    cout << header.height << "x" << header.width << " - " << header.signature << endl;
-
     uint32_t padding = header.width - ((header.width / 4) * 4);
 
     uint8_t* raw_pixels = raw_data + header.dataoffset;
@@ -72,18 +71,18 @@ int BITMAP::decode(uint8_t* raw_data)
     return 0;
 }
 
-int BITMAP::load(FILE* fp)
+int BITMAP::load(std::istream& input)
 {
-    fseek(fp, 0, SEEK_END); // go to the end of the file
+    input.seekg(0, ios::end);
 
-    uint32_t fp_size = ftell(fp);
+    uint32_t input_size = input.tellg();
 
-    rewind(fp); // go to the start of the file
+    input.seekg(0, ios::beg); // go to the start of the file
 
 
-    auto raw_data = vector<uint8_t>(fp_size);
+    auto raw_data = vector<uint8_t>(input_size);
 
-    fread(raw_data.data(), sizeof(uint8_t), fp_size, fp);
+    input.read(reinterpret_cast<char*>(raw_data.data()), input_size);
 
 
     int err = this->decode(raw_data.data());
@@ -148,14 +147,14 @@ vector<uint8_t> BITMAP::encode()
     return raw_data;
 }
 
-int BITMAP::save(FILE* fp)
+int BITMAP::save(std::ostream& output)
 {
     vector<uint8_t> raw_data = encode();
     uint32_t raw_data_size = header.dataoffset + header.imagesize;
 
-    size_t wroted_bytes = fwrite(raw_data.data(), sizeof(uint8_t), raw_data_size, fp);
+    output.write(reinterpret_cast<char*>(raw_data.data()), raw_data_size);
 
-    if(wroted_bytes != raw_data_size)
+    if(!output.good())
     {
         return 1;
     }

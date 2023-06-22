@@ -8,7 +8,7 @@ std::ostream& operator<<(std::ostream& os, const IMAGE::RGB& pixel)
 
 std::ostream& operator<<(std::ostream& os, const IMAGE::BITMAP_HEADER& header)
 {
-    os << "signature: " << header.signature << std::endl;
+    os << "signature: " << std::string(reinterpret_cast<const char*>(header.signature), 2) << std::endl;
 
     os << "filesize: " << header.filesize << std::endl;
     os << "reserved: " << header.reserved << std::endl;
