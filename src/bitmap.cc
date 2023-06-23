@@ -183,3 +183,13 @@ int BITMAP::save(string& file)
 
     return this->save(output);
 }
+
+std::unique_ptr<std::string> BITMAP::ascii(const std::string& charecter_palette)
+{
+    return IMAGE::image2ascii(this->pixels, this->header.width, this->header.height, charecter_palette);
+}
+
+unique_ptr<string> BITMAP::ascii()
+{
+    return IMAGE::image2ascii(this->pixels, this->header.width, this->header.height);
+}
