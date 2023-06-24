@@ -1,31 +1,43 @@
 #include "include/image.hpp"
+#include "include/algorithm.hpp"
+#include "include/player.hpp"
 
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 
+namespace fs = std::filesystem;
 using namespace std;
 using namespace IMAGE;
 
 int main(int argc, const char** argv)
 {
-    string input = string(argv[1]);
-    string output = string("out.bmp");
+    vector<fs::directory_entry> bmpFiles;
 
-    if(argc >= 3)
+    std::string path(argv[1]);
+
+    for (const auto& entry : fs::directory_iterator(path))
     {
-        output = string(argv[2]);
+        if(entry.path().has_extension() && entry.path().extension().string() == string(".bmp"))
+        {
+            bmpFiles.push_back(entry);
+        }
+    }
+    
+    CUSTOM_ALGORITHM::sort_by_aplhabet(bmpFiles);
+
+    vector<string> frames;
+
+    for (const auto& entry : bmpFiles)
+    {
+        string file_path = entry.path().string();
+        BITMAP bmp(file_path);
+        string ascii = bmp.ascii();
+    
+        frames.push_back(ascii);
     }
 
-    BITMAP bmp(input);
-
-    cout << bmp.pixels.at(0) << endl;
-    cout << bmp.header << endl;
-
-    string df = string("@#$=:~-,. ");
-
-    unique_ptr<string> as_ascii = bmp.ascii(df);
-
-    cout << as_ascii->c_str() << endl;
+    PLAYER::player(frames, fps_ns(atoi(argv[2])), true, true);
 
     return 0;
 }

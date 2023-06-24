@@ -2,6 +2,7 @@
 build
 *.out
 .vscode
+frames
 
 # CMake
 CMakeLists.txt.user
