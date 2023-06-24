@@ -10,32 +10,12 @@ string IMAGE::image2ascii(const vector<RGB>& pixels, const uint32_t& width, cons
     const uint32_t size = width * height;
 
     string ascii;
-    //auto ascii = unique_ptr<std::string>();
 
-    //ascii.reserve(size + height);
+    ascii.reserve(size + height);
 
-    uint32_t width_count = 0;
-
-    for (size_t i = 0; i < pixels.size();)
+    for (size_t i = 0; i < pixels.size() - 1;)
     {
-        width_count++;
-
-        if (width_count <= width)
-        {
-
-        }
-        else
-        {
-            
-        }
-    }
-    
-
-    for (uint32_t i = 0; i < pixels.size()+width;)
-    {
-        width_count++;
-
-        if (width_count <= width)
+        for (size_t width_count = 0; width_count < width; width_count++)
         {
             const RGB& pixel = pixels.at(i++);
 
@@ -51,11 +31,8 @@ string IMAGE::image2ascii(const vector<RGB>& pixels, const uint32_t& width, cons
 
             ascii.push_back(charecter_palette.at(color_select));
         }
-        else
-        {
-            ascii.push_back('\n');
-            width_count = 0;
-        }
+        
+        ascii.push_back('\n');
     }
 
     return ascii;
