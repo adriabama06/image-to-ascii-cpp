@@ -3,15 +3,15 @@
 using namespace IMAGE;
 using namespace std;
 
-string IMAGE::image2ascii(const vector<RGB>& pixels, const uint32_t& width, const uint32_t& height, const string& charecter_palette)
+unique_ptr<string> IMAGE::image2ascii(const vector<RGB>& pixels, const uint32_t& width, const uint32_t& height, const string& charecter_palette)
 {
     const size_t charecter_palette_length = charecter_palette.length();
 
     const uint32_t size = width * height;
 
-    string ascii;
+    auto ascii = make_unique<string>();
 
-    ascii.reserve(size + height);
+    ascii->reserve(size + height);
 
     for (size_t i = 0; i < pixels.size() - 1;)
     {
@@ -29,16 +29,16 @@ string IMAGE::image2ascii(const vector<RGB>& pixels, const uint32_t& width, cons
 	            color_select = charecter_palette_length - 1;
             }
 
-            ascii.push_back(charecter_palette.at(color_select));
+            ascii->push_back(charecter_palette.at(color_select));
         }
         
-        ascii.push_back('\n');
+        ascii->push_back('\n');
     }
 
     return ascii;
 }
 
-string IMAGE::image2ascii(const vector<RGB>& pixels, const uint32_t& width, const uint32_t& height)
+unique_ptr<string> IMAGE::image2ascii(const vector<RGB>& pixels, const uint32_t& width, const uint32_t& height)
 {
     return IMAGE::image2ascii(pixels, width, height, DEFAULT_CHAR_PALETTE);
 }

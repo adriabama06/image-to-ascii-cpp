@@ -17,8 +17,8 @@ namespace IMAGE
         uint8_t b;
     } RGB;
 
-    std::string image2ascii(const std::vector<RGB>& pixels, const uint32_t& width, const uint32_t& height, const std::string& charecter_palette);
-    std::string image2ascii(const std::vector<RGB>& pixels, const uint32_t& width, const uint32_t& height);
+    std::unique_ptr<std::string> image2ascii(const std::vector<RGB>& pixels, const uint32_t& width, const uint32_t& height, const std::string& charecter_palette);
+    std::unique_ptr<std::string> image2ascii(const std::vector<RGB>& pixels, const uint32_t& width, const uint32_t& height);
 
     typedef struct BITMAP_HEADER
     {
@@ -62,8 +62,8 @@ namespace IMAGE
         int save(std::ostream& output);
         int save(std::string& file);
 
-        std::string ascii(const std::string& charecter_palette);
-        std::string ascii();
+        std::unique_ptr<std::string> ascii(const std::string& charecter_palette);
+        std::unique_ptr<std::string> ascii();
     };
 } // namespace BITMAP
 
