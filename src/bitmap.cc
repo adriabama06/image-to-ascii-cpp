@@ -102,7 +102,11 @@ int BITMAP::load(std::string& file)
         return 1;
     }
 
-    return this->load(input);
+    int r = this->load(input);
+
+    input.close();
+
+    return r;
 }
 
 vector<uint8_t> BITMAP::encode()
@@ -181,7 +185,11 @@ int BITMAP::save(string& file)
         return 1;
     }
 
-    return this->save(output);
+    int r = this->save(output);
+
+    output.close();
+
+    return r;
 }
 
 unique_ptr<string> BITMAP::ascii(const string& charecter_palette)

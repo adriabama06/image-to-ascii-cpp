@@ -11,8 +11,10 @@ typedef struct ARGUMENTS
     double fps = 0;
     std::string pallete = IMAGE::DEFAULT_CHAR_PALETTE;
 
-    bool clear_console = false;
+    bool no_clear_console = false;
     bool verbose = false;
+    bool preload = false;
+    bool txt = false;
 
     size_t n_threads = 0;
 } ARGUMENTS;

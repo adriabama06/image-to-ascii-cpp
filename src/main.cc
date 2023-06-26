@@ -26,16 +26,16 @@ int main(int argc, const char** argv)
         {
             cout << "Input must be a bmp file" << endl;
 
-            exit(0);
+            return 1;
         }
 
-        unique_ptr<string> ascii = BITMAP(options.input).ascii();
+        unique_ptr<string> ascii = BITMAP(options.input).ascii(options.pallete);
 
         if(options.output.size() == 0)
         {
             cout << *ascii << endl;
 
-            exit(0);
+            return 1;
         }
 
         fs::directory_entry output_stats(options.output);
@@ -44,7 +44,7 @@ int main(int argc, const char** argv)
         {
             cout << "Output must be a file, not a folder" << endl;
 
-            exit(0);
+            return 1;
         }
 
         ofstream output_file(options.output);
@@ -62,7 +62,7 @@ int main(int argc, const char** argv)
         {
             cout << "Error writing output file" << endl;
 
-            exit(0);
+            return 1;
         }
 
         output_file.close();
@@ -72,22 +72,39 @@ int main(int argc, const char** argv)
             cout << options.input << " -> " << options.output << endl;
         }
 
-        exit(0);
+        return 0;
     }
 
-    vector<fs::directory_entry> bmpFiles;
+    vector<fs::directory_entry> inputFiles;
 
     for (const auto& entry : fs::directory_iterator(options.input))
     {
-        if(entry.is_regular_file() && entry.path().has_extension() && entry.path().extension().string() == string(".bmp"))
+        if(entry.is_regular_file() && entry.path().has_extension())
         {
-            bmpFiles.push_back(entry);
+            if(options.txt && entry.path().extension().string() == string(".txt"))
+            {
+                inputFiles.push_back(entry);
+                
+                continue;
+            }
+
+            if(entry.path().extension().string() == string(".bmp"))
+            {
+                inputFiles.push_back(entry);
+            }
         }
+    }
+
+    if(inputFiles.size() == 0)
+    {
+        cout << "Input folder is empty, can't find any .bmp/.txt file" << endl;
+
+        return 1;
     }
 
     if(options.output.size() > 0)
     {
-        size_t bmpFiles_size = bmpFiles.size();
+        size_t bmpFiles_size = inputFiles.size();
 
         if(options.n_threads >= 1)
         {
@@ -99,7 +116,7 @@ int main(int argc, const char** argv)
                 size_t to = (i + 1) * (bmpFiles_size / options.n_threads);
 
                 threads.push_back(
-                    thread(CONVERT::convert_multiple, bmpFiles, options.output, options.pallete, options.verbose, from, to)
+                    thread(CONVERT::convert_multiple, inputFiles, options.output, options.pallete, options.verbose, from, to)
                 );
             }
 
@@ -107,80 +124,63 @@ int main(int argc, const char** argv)
             {
                 t.join();
             }
-
-            exit(0);
         }
         else
         {
-            CONVERT::convert_multiple(bmpFiles, options.output, options.pallete, options.verbose, 0, bmpFiles_size);
-        
-            exit(0);
+            CONVERT::convert_multiple(inputFiles, options.output, options.pallete, options.verbose, 0, bmpFiles_size);
         }
+
+        return 0;
     }
 
-    return 0;
-}
+    CUSTOM_ALGORITHM::sort_by_aplhabet(inputFiles);
 
-int raltime_player_main(int argc, const char** argv)
-{
-    vector<fs::directory_entry> bmpFiles;
-
-    std::string path(argv[1]);
-
-    for (const auto& entry : fs::directory_iterator(path))
+    if (options.preload)
     {
-        if(entry.path().has_extension() && entry.path().extension().string() == string(".bmp"))
+        vector<string> frames;
+
+        for (const auto& entry : inputFiles)
         {
-            bmpFiles.push_back(entry);
+            string filePath = entry.path().string();
+
+            if(!options.txt)
+            {
+                BITMAP bmp(filePath);
+                unique_ptr<string> ascii = bmp.ascii(options.pallete);
+
+                frames.push_back(*ascii);
+
+                continue;
+            }
+            else
+            {
+                ifstream input(filePath);
+
+                if (!input)
+                {
+                    exit(1);
+                }
+
+                string str;
+
+                input.seekg(0, ios::end);
+                str.reserve(input.tellg());
+                input.seekg(0, ios::beg);
+
+                str.assign((istreambuf_iterator<char>(input)), istreambuf_iterator<char>());
+
+                frames.push_back(move(str));
+
+                input.close();
+            }
         }
+
+        PLAYER::player(frames, fps_microseconds(options.fps), !options.no_clear_console, options.verbose);
     }
-    
-    CUSTOM_ALGORITHM::sort_by_aplhabet(bmpFiles);
-
-    PLAYER::player_realtime_convert(bmpFiles, fps_ns(atof(argv[2])), true, true, DEFAULT_CHAR_PALETTE);
-
-    return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-int old_main(int argc, const char** argv)
-{
-    vector<fs::directory_entry> bmpFiles;
-
-    std::string path(argv[1]);
-
-    for (const auto& entry : fs::directory_iterator(path))
+    else
     {
-        if(entry.path().has_extension() && entry.path().extension().string() == string(".bmp"))
-        {
-            bmpFiles.push_back(entry);
-        }
+        PLAYER::player(inputFiles, fps_microseconds(options.fps), options.pallete, !options.no_clear_console, options.verbose, options.txt);
     }
-    
-    CUSTOM_ALGORITHM::sort_by_aplhabet(bmpFiles);
-
-    vector<string> frames;
-
-    for (const auto& entry : bmpFiles)
-    {
-        string file_path = entry.path().string();
-        BITMAP bmp(file_path);
-        unique_ptr<string> ascii = bmp.ascii();
-    
-        frames.push_back(*ascii);
-    }
-
-    PLAYER::player(frames, fps_ns(atof(argv[2])), true, true);
 
     return 0;
 }

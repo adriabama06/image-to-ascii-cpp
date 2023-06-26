@@ -8,6 +8,7 @@
 #include <csignal>
 #include <fstream>
 #include <chrono>
+#include <streambuf>
 
 void exit_handler(int num) {
     CONSOLE::show_cursor();
@@ -86,7 +87,7 @@ void PLAYER::player(const vector<string>& frames, const uint32_t framerate_micro
 }
 
 
-void PLAYER::player_realtime_convert(const vector<filesystem::directory_entry>& files, const uint32_t framerate_microseconds, const bool clear_console, const bool verbose, const string& charecter_palette)
+void PLAYER::player(const vector<filesystem::directory_entry>& files, const uint32_t framerate_microseconds, const string& charecter_palette, const bool clear_console, const bool verbose, const bool txt)
 {
     signal(SIGINT, exit_handler);
     CONSOLE::hide_cursor();
@@ -124,9 +125,33 @@ void PLAYER::player_realtime_convert(const vector<filesystem::directory_entry>& 
         const filesystem::directory_entry& file = files.at(i);
 
         string filePath = file.path().string();
-        BITMAP bmp(filePath);
+        unique_ptr<string> frame;
+        
+        if(!txt)
+        {
+            BITMAP bmp(filePath);
 
-        unique_ptr<string> frame = bmp.ascii(charecter_palette);
+            frame = bmp.ascii(charecter_palette);
+        }
+        else
+        {
+            ifstream input(filePath);
+
+            if (!input)
+            {
+                exit(1);
+            }
+
+            frame = make_unique<string>();
+
+            input.seekg(0, ios::end);
+            frame->reserve(input.tellg());
+            input.seekg(0, ios::beg);
+
+            frame->assign((istreambuf_iterator<char>(input)), istreambuf_iterator<char>());
+
+            input.close();
+        }
 
         if(clear_console)
         {
@@ -134,7 +159,7 @@ void PLAYER::player_realtime_convert(const vector<filesystem::directory_entry>& 
         }
         if(verbose)
         {
-            cout << i << "/" << files_size << " "
+            cout << file.path().filename().string() << " " << i << "/" << files_size << " "
             << chrono::time_point_cast<chrono::microseconds>(current).time_since_epoch().count() << " - "
             << chrono::time_point_cast<chrono::microseconds>(start).time_since_epoch().count() << " = " << elapsed_time << endl;
         }

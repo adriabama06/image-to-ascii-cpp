@@ -45,8 +45,10 @@ ARGUMENTS parseArguments(int __argc, const char** argv)
             cout << "  -o             <file/folder> (Optional) - Output file or folder, optional if you just want to play it, if you play the input it will not save any file" << endl;
             cout << "  -fps           <number>                 - (Optional only if \"-o\" is not set) Set framerate in frames per second, example: 30, 24, 60, 23.976023976 (for cinema using float numbers use: \"1000 / (1001 / fps)\")" << endl;
             cout << "  -pallete       <string>      (Optional) - Set custom color pallete for ascii, the default is: \"" << IMAGE::DEFAULT_CHAR_PALETTE << "\"" << endl;
-            cout << "  -clear-console               (Optional) - Linux only, clear console before new frame draw, good for clean console to make it look better, bad for ssh connections" << endl;
+            cout << "  -no-clear-console            (Optional) - Prevent clear console everyframe, good for ssh connections" << endl;
             cout << "  -t             <number>      (Optional) - Threads for paralel frame conversion, sometimes can be slow than single thread, recomended on slow computers or if the folder has plenty of files" << endl;
+            cout << "  -preload                     (Optional) - Set if preload the files in memory before play, if you no set this the playback will be converted in realtime" << endl;
+            cout << "  -txt                         (Optional) - Set this to true if the input is a preconverted bmp file as txt" << endl;
             cout << "  -v                           (Optional) - Verbose output" << endl;
 
             exit(0);
@@ -88,9 +90,9 @@ ARGUMENTS parseArguments(int __argc, const char** argv)
             continue;
         }
 
-        if(strcmp(param, "-clear-console") == 0)
+        if(strcmp(param, "-no-clear-console") == 0)
         {
-            options.clear_console = true;
+            options.no_clear_console = true;
 
             continue;
         }
@@ -100,6 +102,20 @@ ARGUMENTS parseArguments(int __argc, const char** argv)
             const char* argument = valid_arguments(i, argc, argv);
 
             options.n_threads = atoi(argument);
+
+            continue;
+        }
+
+        if(strcmp(param, "-preload") == 0)
+        {
+            options.preload = true;
+
+            continue;
+        }
+
+        if(strcmp(param, "-txt") == 0)
+        {
+            options.txt = true;
 
             continue;
         }
@@ -125,12 +141,16 @@ ARGUMENTS parseArguments(int __argc, const char** argv)
     {
         cout << options.input << " -> Not exists" << endl;
 
+        input_entry.~directory_entry();
+
         exit(0);
     }
 
     if (options.output.size() == 0 && options.fps <= 0.0 && filesystem::directory_entry(options.input).is_directory())
     {
         cout << "If the output is not specified and input is a folder it means you will play it, please specify \"-fps\", fps can't be 0 or a negative number" << endl;
+
+        input_entry.~directory_entry();
 
         exit(0);
     }
@@ -139,6 +159,15 @@ ARGUMENTS parseArguments(int __argc, const char** argv)
     if (options.n_threads == 1 || input_entry.is_regular_file())
     {
         options.n_threads = 0;
+    }
+
+    if(options.output.size() > 0 && options.txt)
+    {
+        cout << "\"-txt\" is only for play not for convert" << endl;
+
+        input_entry.~directory_entry();
+
+        exit(0);
     }
 
     return options;
