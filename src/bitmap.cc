@@ -93,7 +93,7 @@ int BITMAP::load(std::istream& input)
     return err;
 }
 
-int BITMAP::load(std::string& file)
+int BITMAP::load(const std::string& file)
 {
     ifstream input(file, ios::binary);
 
@@ -177,7 +177,7 @@ int BITMAP::save(std::ostream& output)
     return 0;
 }
 
-int BITMAP::save(string& file)
+int BITMAP::save(const string& file)
 {
     ofstream output(file, ios::binary);
 

@@ -46,7 +46,10 @@ namespace IMAGE
     public:
         BITMAP() {}
         ~BITMAP() {}
-        BITMAP(std::string& file) {
+        BITMAP(const std::string file) {
+            this->load(file);
+        }
+        BITMAP(const std::string& file) {
             this->load(file);
         }
 
@@ -57,10 +60,10 @@ namespace IMAGE
         std::vector<uint8_t> encode();
 
         int load(std::istream& input);
-        int load(std::string& file);
+        int load(const std::string& file);
 
         int save(std::ostream& output);
-        int save(std::string& file);
+        int save(const std::string& file);
 
         std::unique_ptr<std::string> ascii(const std::string& charecter_palette);
         std::unique_ptr<std::string> ascii();

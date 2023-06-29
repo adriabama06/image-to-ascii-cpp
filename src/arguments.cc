@@ -155,12 +155,6 @@ ARGUMENTS parseArguments(int __argc, const char** argv)
         exit(0);
     }
 
-    // if you only will use 1 thread directly don't waste time on create threard and do the process directly
-    if (options.n_threads == 1 || input_entry.is_regular_file())
-    {
-        options.n_threads = 0;
-    }
-
     if(options.output.size() > 0 && options.txt)
     {
         cout << "\"-txt\" is only for play not for convert" << endl;

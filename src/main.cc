@@ -22,57 +22,7 @@ int main(int argc, const char** argv)
 
     if(input_stats.is_regular_file())
     {
-        if(!input_stats.path().has_extension() || input_stats.path().extension().string() != string(".bmp"))
-        {
-            cout << "Input must be a bmp file" << endl;
-
-            return 1;
-        }
-
-        unique_ptr<string> ascii = BITMAP(options.input).ascii(options.pallete);
-
-        if(options.output.size() == 0)
-        {
-            cout << *ascii << endl;
-
-            return 1;
-        }
-
-        fs::directory_entry output_stats(options.output);
-        
-        if(output_stats.exists() && output_stats.is_directory())
-        {
-            cout << "Output must be a file, not a folder" << endl;
-
-            return 1;
-        }
-
-        ofstream output_file(options.output);
-
-        if(!output_file)
-        {
-            cout << "Error opening output file" << endl;
-
-            exit(0);
-        }
-
-        output_file << *ascii;
-
-        if(!output_file.good())
-        {
-            cout << "Error writing output file" << endl;
-
-            return 1;
-        }
-
-        output_file.close();
-
-        if(options.verbose)
-        {
-            cout << options.input << " -> " << options.output << endl;
-        }
-
-        return 0;
+        return CONVERT::convert(options.input, input_stats, options.output, options.pallete, options.verbose);
     }
 
     vector<fs::directory_entry> inputFiles;
@@ -84,11 +34,8 @@ int main(int argc, const char** argv)
             if(options.txt && entry.path().extension().string() == string(".txt"))
             {
                 inputFiles.push_back(entry);
-                
-                continue;
             }
-
-            if(entry.path().extension().string() == string(".bmp"))
+            else if(entry.path().extension().string() == string(".bmp"))
             {
                 inputFiles.push_back(entry);
             }
@@ -106,7 +53,11 @@ int main(int argc, const char** argv)
     {
         size_t bmpFiles_size = inputFiles.size();
 
-        if(options.n_threads >= 1)
+        if(options.n_threads == 0)
+        {
+            CONVERT::convert_multiple(inputFiles, options.output, options.pallete, options.verbose, 0, bmpFiles_size);
+        }
+        else
         {
             vector<thread> threads;
 
@@ -125,10 +76,6 @@ int main(int argc, const char** argv)
                 t.join();
             }
         }
-        else
-        {
-            CONVERT::convert_multiple(inputFiles, options.output, options.pallete, options.verbose, 0, bmpFiles_size);
-        }
 
         return 0;
     }
@@ -141,16 +88,17 @@ int main(int argc, const char** argv)
 
         for (const auto& entry : inputFiles)
         {
-            string filePath = entry.path().string();
+            const string filePath = entry.path().string();
 
             if(!options.txt)
             {
-                BITMAP bmp(filePath);
+                BITMAP bmp;
+
+                bmp.load(filePath);
+
                 unique_ptr<string> ascii = bmp.ascii(options.pallete);
 
                 frames.push_back(*ascii);
-
-                continue;
             }
             else
             {

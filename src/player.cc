@@ -124,12 +124,14 @@ void PLAYER::player(const vector<filesystem::directory_entry>& files, const uint
 
         const filesystem::directory_entry& file = files.at(i);
 
-        string filePath = file.path().string();
+        const string filePath = file.path().string();
         unique_ptr<string> frame;
         
         if(!txt)
         {
-            BITMAP bmp(filePath);
+            BITMAP bmp;
+
+            bmp.load(filePath);
 
             frame = bmp.ascii(charecter_palette);
         }
