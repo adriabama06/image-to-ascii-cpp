@@ -18,16 +18,22 @@ if(WIN32) # Windows BITMAP struct conflict
     add_definitions(-DNOGDI)
 endif(WIN32)
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set_property(TARGET image-to-ascii-cpp PROPERTY CXX_STANDARD 17)
 
-install(TARGETS image-to-ascii-cpp DESTINATION bin)
-add_custom_target("uninstall" COMMENT "Uninstall installed files")
-add_custom_command(
-    TARGET "uninstall"
-    POST_BUILD
-    COMMENT "Uninstall files with install_manifest.txt"
-    COMMAND xargs rm -vf < install_manifest.txt || echo Nothing in
-            install_manifest.txt to be uninstalled!
-)
+if(NOT WIN32)
+    set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lstdc++fs")
+
+    install(TARGETS image-to-ascii-cpp DESTINATION bin)
+    add_custom_target("uninstall" COMMENT "Uninstall installed files")
+    add_custom_command(
+        TARGET "uninstall"
+        POST_BUILD
+        COMMENT "Uninstall files with install_manifest.txt"
+        COMMAND xargs rm -vf < install_manifest.txt || echo Nothing in
+        install_manifest.txt to be uninstalled!
+    )
+endif(NOT WIN32)

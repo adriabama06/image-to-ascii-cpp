@@ -21,10 +21,8 @@ const char* valid_arguments(size_t& i, size_t argc, const char** argv)
     return argv[i];
 }
 
-ARGUMENTS parseArguments(int __argc, const char** argv)
+ARGUMENTS parseArguments(int argc, const char** argv)
 {
-    size_t argc = __argc;
-
     if(argc < 2)
     {
         cout << "Please run: " << argv[0] << " --help" << endl;
