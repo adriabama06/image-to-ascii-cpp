@@ -8,6 +8,7 @@
 #include <fstream>
 #include <filesystem>
 #include <thread>
+#include <set>
 
 namespace fs = std::filesystem;
 using namespace std;
@@ -25,7 +26,7 @@ int main(int argc, const char** argv)
         return CONVERT::convert(options.input, input_stats, options.output, options.pallete, options.verbose);
     }
 
-    vector<fs::directory_entry> inputFiles;
+    set<fs::directory_entry> inputFilesSet;
 
     for (const auto& entry : fs::directory_iterator(options.input))
     {
@@ -33,14 +34,18 @@ int main(int argc, const char** argv)
         {
             if(options.txt && entry.path().extension().string() == string(".txt"))
             {
-                inputFiles.push_back(entry);
+                inputFilesSet.insert(entry);
             }
             else if(entry.path().extension().string() == string(".bmp"))
             {
-                inputFiles.push_back(entry);
+                inputFilesSet.insert(entry);
             }
         }
     }
+
+    vector<fs::directory_entry> inputFiles(inputFilesSet.begin(), inputFilesSet.end());
+
+    inputFilesSet.~set();
 
     if(inputFiles.size() == 0)
     {
@@ -79,8 +84,6 @@ int main(int argc, const char** argv)
 
         return 0;
     }
-
-    CUSTOM_ALGORITHM::sort_by_aplhabet(inputFiles);
 
     if (options.preload)
     {
