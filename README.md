@@ -31,3 +31,12 @@ of files
   -txt                         (Optional) - Set this to true if the input is a preconverted bmp file as txt
   -v                           (Optional) - Verbose output
 ```
+# Conversion
+```bash
+$ > image-to-ascii-cpp -i imgs -o txts
+```
+# Play
+```bash
+$ > image-to-ascii-cpp -i imgs -fps 30
+```
+Change `-fps` to the correct speed of the video, can use float numbers, like 23.976023976 (24000 / 1001, the cinema fps)
